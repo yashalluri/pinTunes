@@ -1,21 +1,77 @@
+/* Globals */
+/* Tailwind base styles */
+/* Tailwind base styles */
+/* Tailwind base styles */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Custom Colors */
+.text-gray-300 {
+  color: #d1d5db; /* Soft gray for text */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+.text-purple-500 {
+  color: #a855f7; /* Purple highlight */
+}
+
+.bg-black {
+  background-color: #000000; /* Sleek black background */
+}
+
+.bg-gray-800 {
+  background-color: #1f2937; /* Dark gray for the login form */
+}
+
+.bg-gray-700 {
+  background-color: #374151; /* Slightly lighter gray for input fields */
+}
+
+/* Font Family */
+.font-sans {
+  font-family: 'Inter', sans-serif; /* Sleek modern font */
+}
+/* Custom Colors */
+.text-gray-300 {
+  color: #d1d5db; /* Soft gray for text */
+}
+
+.text-purple-500 {
+  color: #a855f7; /* Purple highlight for PinTunes */
+}
+
+.bg-black {
+  background-color: #000000; /* Sleek black background */
+}
+
+/* Font Family */
+.font-sans {
+  font-family: 'Inter', sans-serif; /* Sleek modern font */
+}
+
+
+/* Aurora Background */
+.aurora-background {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top left, rgba(72,61,139,0.8), transparent),
+              radial-gradient(circle at bottom right, rgba(138,43,226,0.6), transparent),
+              radial-gradient(circle at center, rgba(25,25,112,0.5), transparent);
+  animation: aurora-animation 8s infinite alternate ease-in-out;
+  background: radial-gradient(circle at top left, rgba(255,69,0,0.7), transparent),
+            radial-gradient(circle at bottom right, rgba(75,0,130,0.6), transparent),
+            radial-gradient(circle at center, rgba(25,25,112,0.5), transparent);
+
+}
+
+/* Aurora Animation */
+@keyframes aurora-animation {
+  from {
+    background-position: top left, bottom right, center;
+    filter: hue-rotate(0deg);
   }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  to {
+    background-position: bottom right, top left, center;
+    filter: hue-rotate(360deg);
+  }
 }
