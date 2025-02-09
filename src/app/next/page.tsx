@@ -3,9 +3,11 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { useUser } from '../../contexts/UserContext';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { setUser } = useUser();
   const [stars, setStars] = useState<{ top: string; left: string }[]>([]);
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
@@ -29,6 +31,9 @@ export default function LoginPage() {
     e.preventDefault();
     
     try {
+      // For login, get the stored CID first
+      const storedCID = localStorage.getItem('userCID');
+      
       const response = await fetch('/api/auth', {
         method: 'POST',
         headers: {
@@ -37,7 +42,7 @@ export default function LoginPage() {
         body: JSON.stringify({
           action: isLogin ? 'login' : 'signup',
           ...formData,
-          ...(isLogin && { cid: localStorage.getItem('userCID') }),
+          cid: isLogin ? storedCID : undefined, // Only include CID for login
         }),
       });
 
@@ -45,12 +50,37 @@ export default function LoginPage() {
       
       if (data.success) {
         if (!isLogin) {
+          // Handle signup success
           localStorage.setItem('userCID', data.cid);
           alert('Signup successful! Please login.');
           setIsLogin(true);
           setFormData({ username: '', email: '', password: '' });
         } else {
-          localStorage.setItem('userData', JSON.stringify(data.user));
+          // Handle login success
+          localStorage.setItem('userCID', data.cid);
+          
+          // Fetch complete user data
+          const userDataResponse = await fetch('/api/getUserData', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ cid: data.cid }),
+          });
+          
+          if (!userDataResponse.ok) {
+            throw new Error('Failed to fetch user data');
+          }
+          
+          const userData = await userDataResponse.json();
+          
+          // Set user in context with all necessary data
+          setUser({
+            username: userData.username,
+            email: userData.email,
+            cid: data.cid,
+          });
+          
           router.push('/dashboard');
         }
       } else {
@@ -58,7 +88,7 @@ export default function LoginPage() {
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('An error occurred');
+      alert('An error occurred during authentication');
     }
   };
 

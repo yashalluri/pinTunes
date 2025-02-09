@@ -75,3 +75,49 @@
     filter: hue-rotate(360deg);
   }
 }
+
+/* Add these styles for markdown content */
+.markdown-body {
+  @apply text-gray-100 text-sm leading-normal;
+}
+
+.markdown-body h1 {
+  @apply text-xl font-bold mb-2;
+}
+
+.markdown-body h2 {
+  @apply text-lg font-bold mb-2;
+}
+
+.markdown-body h3 {
+  @apply text-base font-bold mb-1;
+}
+
+.markdown-body strong {
+  @apply font-bold;
+}
+
+.markdown-body em {
+  @apply italic;
+}
+
+.markdown-body blockquote {
+  @apply border-l-4 border-gray-600 pl-4 my-2;
+}
+
+.markdown-body table {
+  @apply w-full border-collapse my-2;
+}
+
+.markdown-body th,
+.markdown-body td {
+  @apply border border-gray-700 px-2 py-1;
+}
+
+.markdown-body th {
+  @apply bg-[#2E2F33];
+}
+
+.markdown-body hr {
+  @apply my-4 border-gray-700;
+}
