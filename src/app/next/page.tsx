@@ -1,11 +1,18 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [stars, setStars] = useState<{ top: string; left: string }[]>([]);
-  const [isLogin, setIsLogin] = useState(true); // Toggle between login and sign-up
+  const [isLogin, setIsLogin] = useState(true);
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+  });
 
   // Generate star positions on the client side
   useEffect(() => {
@@ -17,6 +24,71 @@ export default function LoginPage() {
       setStars(generatedStars);
     }
   }, []);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: isLogin ? 'login' : 'signup',
+          ...formData,
+          ...(isLogin && { cid: localStorage.getItem('userCID') }),
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        if (!isLogin) {
+          localStorage.setItem('userCID', data.cid);
+          alert('Signup successful! Please login.');
+          setIsLogin(true);
+          setFormData({ username: '', email: '', password: '' });
+        } else {
+          localStorage.setItem('userData', JSON.stringify(data.user));
+          router.push('/dashboard');
+        }
+      } else {
+        alert(data.error || 'An error occurred');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('An error occurred');
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const testPinata = async () => {
+    try {
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'signup',
+          username: 'test',
+          email: 'test@test.com',
+          password: 'test123'
+        }),
+      });
+      const data = await response.json();
+      console.log('Pinata response:', data);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   return (
     <div className="relative flex flex-col items-center justify-center h-screen bg-black overflow-hidden">
@@ -43,7 +115,6 @@ export default function LoginPage() {
         ))}
       </div>
 
-      {/* Login/Sign-Up Form */}
       <motion.div
         className="relative z-10 bg-gray-800 p-8 rounded-lg shadow-lg w-[90%] max-w-md"
         initial={{ opacity: 0, y: -20 }}
@@ -53,22 +124,31 @@ export default function LoginPage() {
         <h2 className="text-3xl font-bold text-white mb-6 text-center">
           {isLogin ? 'Login' : 'Sign Up'}
         </h2>
-        <form className="flex flex-col space-y-4">
+        <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
           {!isLogin && (
             <input
               type="text"
+              name="username"
               placeholder="Username"
+              value={formData.username}
+              onChange={handleInputChange}
               className="p-3 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           )}
           <input
             type="email"
+            name="email"
             placeholder="Email"
+            value={formData.email}
+            onChange={handleInputChange}
             className="p-3 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
           <input
             type="password"
+            name="password"
             placeholder="Password"
+            value={formData.password}
+            onChange={handleInputChange}
             className="p-3 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
           <button
